@@ -51,6 +51,10 @@ let current = null;
 let completed = 0;
 let rotation = 0;
 let timerInterval;
+let exerciseTimerInterval;
+let timerMode = "idle";
+let audioContext = null;
+let history = [];
 
 const wheel = document.getElementById("wheel");
 const spinBtn = document.getElementById("spinBtn");
@@ -58,6 +62,8 @@ const againBtn = document.getElementById("againBtn");
 const startBtn = document.getElementById("startBtn");
 const timerOverlay = document.getElementById("timerOverlay");
 const timerDisplay = document.getElementById("timer");
+const timerMessage = timerOverlay.querySelector("p");
+const historyList = document.getElementById("historyList");
 
 function getPool() {
   return mode === "FULL BODY" ? all : exercises[mode];
@@ -97,21 +103,45 @@ function spin() {
   }, 4100);
 }
 
-function startRestTimer() {
-  if (!current) return;
-  let seconds = Number(current[5]);
-  timerOverlay.classList.add("show");
-  updateTimer(seconds);
+function playBell() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
 
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    seconds--;
-    updateTimer(seconds);
-    if (seconds <= 0) {
-      clearInterval(timerInterval);
-      timerDisplay.textContent = "DONE";
-    }
-  }, 1000);
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+
+  const now = audioContext.currentTime;
+  const oscillator = audioContext.createOscillator();
+  const oscillator2 = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  const gainNode2 = audioContext.createGain();
+
+  oscillator.type = "square";
+  oscillator2.type = "sawtooth";
+  oscillator.frequency.setValueAtTime(880, now);
+  oscillator.frequency.exponentialRampToValueAtTime(660, now + 0.16);
+  oscillator2.frequency.setValueAtTime(1320, now);
+  oscillator2.frequency.exponentialRampToValueAtTime(980, now + 0.16);
+
+  gainNode.gain.setValueAtTime(0.0001, now);
+  gainNode.gain.exponentialRampToValueAtTime(0.24, now + 0.01);
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 3);
+
+  gainNode2.gain.setValueAtTime(0.0001, now);
+  gainNode2.gain.exponentialRampToValueAtTime(0.14, now + 0.01);
+  gainNode2.gain.exponentialRampToValueAtTime(0.0001, now + 3);
+
+  oscillator.connect(gainNode);
+  oscillator2.connect(gainNode2);
+  gainNode.connect(audioContext.destination);
+  gainNode2.connect(audioContext.destination);
+
+  oscillator.start(now);
+  oscillator2.start(now);
+  oscillator.stop(now + 3);
+  oscillator2.stop(now + 3);
 }
 
 function updateTimer(seconds) {
@@ -120,12 +150,81 @@ function updateTimer(seconds) {
   timerDisplay.textContent = `${m}:${s}`;
 }
 
+function setTimerUI(mode, message, buttonLabel) {
+  timerMode = mode;
+  timerMessage.textContent = message;
+  document.getElementById("skipTimer").textContent = buttonLabel;
+}
+
+function startExerciseTimer() {
+  if (!current) return;
+  clearInterval(timerInterval);
+  clearInterval(exerciseTimerInterval);
+
+  let seconds = 0;
+  timerOverlay.classList.add("show");
+  updateTimer(seconds);
+  setTimerUI("exercise", "Work. Focus. Tap stop when the set is done.", "STOP & START REST");
+
+  exerciseTimerInterval = setInterval(() => {
+    seconds++;
+    updateTimer(seconds);
+  }, 1000);
+}
+
+function startRestTimer() {
+  if (!current) return;
+  let seconds = Number(current[5]);
+  timerOverlay.classList.add("show");
+  updateTimer(seconds);
+  setTimerUI("rest", "Recover. Breathe. Get ready for the next set.", "SKIP TIMER");
+
+  clearInterval(exerciseTimerInterval);
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    seconds--;
+    updateTimer(seconds);
+    if (seconds <= 0) {
+      clearInterval(timerInterval);
+      timerDisplay.textContent = "DONE";
+      setTimerUI("rest", "Rest complete. Start your next set when ready.", "CLOSE");
+      playBell();
+    }
+  }, 1000);
+}
+
+function renderHistory() {
+  if (!historyList) return;
+  historyList.innerHTML = "";
+
+  if (history.length === 0) {
+    const emptyItem = document.createElement("li");
+    emptyItem.className = "history-item";
+    emptyItem.innerHTML = "<strong>No exercises completed yet</strong><span>Your history will appear here.</span>";
+    historyList.appendChild(emptyItem);
+    return;
+  }
+
+  history.slice().reverse().forEach(entry => {
+    const item = document.createElement("li");
+    item.className = "history-item";
+    item.innerHTML = `<strong>${entry.name}</strong><span>${entry.category}</span>`;
+    historyList.appendChild(item);
+  });
+}
+
 function completeExercise() {
   if (!current) return;
+  clearInterval(exerciseTimerInterval);
   completed++;
+  history.push({
+    name: current[0],
+    category: current[1]
+  });
   document.getElementById("completed").textContent = completed;
   document.getElementById("sessionCount").textContent = completed;
   document.getElementById("progressBar").style.width = `${Math.min(completed * 10, 100)}%`;
+  renderHistory();
   startRestTimer();
 }
 
@@ -148,20 +247,30 @@ document.querySelectorAll(".filter").forEach(button => {
 
 spinBtn.addEventListener("click", spin);
 againBtn.addEventListener("click", spin);
-startBtn.addEventListener("click", completeExercise);
+startBtn.addEventListener("click", startExerciseTimer);
 
 document.getElementById("closeTimer").addEventListener("click", () => {
   clearInterval(timerInterval);
+  clearInterval(exerciseTimerInterval);
+  timerMode = "idle";
   timerOverlay.classList.remove("show");
 });
 document.getElementById("skipTimer").addEventListener("click", () => {
-  clearInterval(timerInterval);
-  timerOverlay.classList.remove("show");
+  if (timerMode === "exercise") {
+    completeExercise();
+  } else {
+    clearInterval(timerInterval);
+    clearInterval(exerciseTimerInterval);
+    timerMode = "idle";
+    timerOverlay.classList.remove("show");
+  }
 });
 
 timerOverlay.addEventListener("click", e => {
   if (e.target === timerOverlay) {
     clearInterval(timerInterval);
+    clearInterval(exerciseTimerInterval);
+    timerMode = "idle";
     timerOverlay.classList.remove("show");
   }
 });

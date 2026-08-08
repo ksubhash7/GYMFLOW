@@ -193,6 +193,33 @@ main {
   padding: 82px 0 70px;
 }
 
+.instruction-box {
+  border-radius: 22px;
+  padding: 18px 20px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.instruction-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.instruction-header strong {
+  font-size: 14px;
+  letter-spacing: .04em;
+}
+
+.instruction-box p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .hero {
   text-align: center;
   margin-bottom: 48px;
@@ -605,6 +632,40 @@ main {
   line-height: 1.6;
 }
 
+/* ---------- HISTORY ---------- */
+
+.history-card {
+  min-height: 220px;
+}
+
+.history-list {
+  list-style: none;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.history-item span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.history-item strong {
+  font-size: 13px;
+}
+
 /* ---------- TIMER ---------- */
 
 .timer-overlay {
@@ -613,7 +674,7 @@ main {
   z-index: 20;
   display: none;
   place-items: center;
-  background: rgba(3,5,10,.58);
+  background: rgba(3,5,10,.78);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -628,6 +689,7 @@ main {
   border-radius: 28px;
   text-align: center;
   position: relative;
+  z-index: 21;
 }
 
 .close-btn {
