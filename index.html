@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYMFLOW — Liquid Glass Trainer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <div class="ambient ambient-c"></div>
+
+  <header class="topbar glass">
+    <div class="brand">
+      <span class="brand-mark">✦</span>
+      <span>GYMFLOW</span>
+    </div>
+    <div class="top-actions">
+      <span class="status-dot"></span>
+      <span class="status-text">TRAINING MODE</span>
+      <button class="icon-btn" aria-label="Settings">⚙</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">REMEMBER! THERE IS NO TOMORROW</div>
+      <h1>YOUR WORKOUT.<br><span>YOUR CHALLENGE.</span></h1>
+      <p>Let the wheel decide what you train next.</p>
+    </section>
+
+    <section class="trainer-layout">
+      <div class="wheel-panel glass">
+        <div class="panel-top">
+          <div>
+            <span class="mini-label">CURRENT MODE</span>
+            <strong id="modeLabel">FULL BODY</strong>
+          </div>
+          <div class="counter"><span id="completed">0</span> COMPLETED</div>
+        </div>
+
+        <div class="wheel-wrap">
+          <div class="pointer"></div>
+          <div class="wheel" id="wheel"></div>
+          <div class="wheel-center">
+            <span>SPIN</span>
+            <small>TO TRAIN</small>
+          </div>
+        </div>
+
+        <button class="spin-btn" id="spinBtn">
+          <span>SPIN THE WHEEL</span>
+          <span class="arrow">↗</span>
+        </button>
+      </div>
+
+      <aside class="result-panel glass">
+        <div class="result-header">
+          <span class="mini-label">NEXT CHALLENGE</span>
+          <span class="live-pill">READY</span>
+        </div>
+
+        <div class="exercise-card" id="exerciseCard">
+          <div class="exercise-icon" id="exerciseIcon">✦</div>
+          <div class="exercise-content">
+            <span class="exercise-category" id="exerciseCategory">WAITING FOR SPIN</span>
+            <h2 id="exerciseName">Spin the wheel</h2>
+            <p id="exerciseDescription">Your next exercise will appear here.</p>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div>
+            <span>SETS</span>
+            <strong id="sets">—</strong>
+          </div>
+          <div>
+            <span>REPS</span>
+            <strong id="reps">—</strong>
+          </div>
+          <div>
+            <span>REST</span>
+            <strong id="rest">—</strong>
+          </div>
+        </div>
+
+        <button class="start-btn" id="startBtn" disabled>START SET</button>
+        <button class="secondary-btn" id="againBtn">↻  SPIN AGAIN</button>
+      </aside>
+    </section>
+
+    <section class="filters">
+      <button class="filter active" data-mode="FULL BODY">Full Body</button>
+      <button class="filter" data-mode="CHEST">Chest</button>
+      <button class="filter" data-mode="BACK">Back</button>
+      <button class="filter" data-mode="LEGS">Legs</button>
+      <button class="filter" data-mode="ARMS">Arms</button>
+      <button class="filter" data-mode="SHOULDERS">Shoulders</button>
+    </section>
+
+    <section class="bottom-grid">
+
+  <!-- SESSION COUNTER -->
+  <div class="info-card glass">
+    <span class="mini-label">TODAY'S SESSION</span>
+
+    <div class="session-value">
+      <strong id="sessionCount">0</strong>
+      <span> exercises completed</span>
+    </div>
+
+    <div class="progress">
+      <span id="progressBar"></span>
+    </div>
+  </div>
+
+  <!-- TRAINING TIP -->
+  <div class="info-card glass">
+    <span class="mini-label">TRAINING TIP</span>
+    <p id="tip">Control every rep. Quality beats momentum.</p>
+  </div>
+
+</section>
+
+<!-- SHOUTOUT -->
+<section class="shoutout glass">
+
+  <span class="mini-label">SPECIAL THANKS</span>
+
+  
+
+  <p>
+    Big shoutout to <strong>@ST007</strong>
+    for helping spark the idea behind GYMFLOW.
+  </p>
+
+  <span class="built-with">
+    <strong>Built by Kompella Subhash</strong>
+  </span>
+
+</section>
+  </main>
+
+  <div class="timer-overlay" id="timerOverlay">
+    <div class="timer-card glass">
+      <button class="close-btn" id="closeTimer">×</button>
+      <span class="mini-label">REST TIMER</span>
+      <div class="timer" id="timer">01:30</div>
+      <p>Recover. Breathe. Get ready for the next set.</p>
+      <button class="start-btn" id="skipTimer">SKIP TIMER</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
